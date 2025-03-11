@@ -1,62 +1,53 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
-  const linkStyle = {
-    textDecoration: 'none',
-    color: 'white',
-    transition: 'color 0.3s',
-  };
+    const [savedCount, setSavedCount] = useState(0);
 
-  const hoverStyle = {
-    textDecoration: 'none',
-    color: '#90caf9', // Light blue on hover
-  };
+    useEffect(() => {
+        const updateSavedCount = () => {
+            const saved = JSON.parse(localStorage.getItem("savedProperties")) || [];
+            setSavedCount(saved.length);
+        };
 
-  return (
-    <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
-      <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Link to="/" style={linkStyle}>
-            MyWebsite
-          </Link>
-        </Typography>
-        <Box>
-                    {/* <Button color="inherit">
-            <Link to="/buy" style={linkStyle}>
-              Buy
-            </Link>
-          </Button>
-          <Button color="inherit">
-            <Link to="/rent" style={linkStyle}>
-              Rent
-            </Link>
-          </Button> */}
-          <Button color="inherit">
-            <Link
-              to="/login"
-              style={linkStyle}
-              onMouseEnter={(e) => (e.target.style.color = '#90caf9')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-            >
-              Login
-            </Link>
-          </Button>
-          <Button color="inherit">
-            <Link
-              to="/signup"
-              style={linkStyle}
-              onMouseEnter={(e) => (e.target.style.color = '#90caf9')}
-              onMouseLeave={(e) => (e.target.style.color = 'white')}
-            >
-              Signup
-            </Link>
-          </Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
-  );
+        window.addEventListener("storage", updateSavedCount);
+        updateSavedCount();
+
+        return () => window.removeEventListener("storage", updateSavedCount);
+    }, []);
+
+    return (
+        <AppBar position="static" sx={{ backgroundColor: "#1976d2" }}>
+            <Toolbar>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    <Link to="/" style={{ textDecoration: "none", color: "white" }}>
+                        MyWebsite
+                    </Link>
+                </Typography>
+
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <Button color="inherit">
+                        <Link to="/saved-properties" style={{ textDecoration: "none", color: "white" }}>
+                            Saved Properties ({savedCount})
+                        </Link>
+                    </Button>
+
+                    {/* Add Login and Signup Buttons */}
+                    <Button color="inherit">
+                        <Link to="/login" style={{ textDecoration: "none", color: "white" }}>
+                            Login
+                        </Link>
+                    </Button>
+                    <Button color="inherit">
+                        <Link to="/signup" style={{ textDecoration: "none", color: "white" }}>
+                            Signup
+                        </Link>
+                    </Button>
+                </Box>
+            </Toolbar>
+        </AppBar>
+    );
 };
 
 export default NavBar;

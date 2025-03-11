@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -12,28 +12,30 @@ import {
 import { useNavigate } from "react-router-dom";
 import background from "../assets/background.png";
 
-const suggestions = [
-  "New York, NY",
-  "Los Angeles, CA",
-  "Chicago, IL",
-  "Houston, TX",
-  "Phoenix, AZ",
-  "10001",
-  "90001",
-  "60601",
-  "77001",
-  "85001",
-];
-
 const HomePage = () => {
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-  const [activeTab, setActiveTab] = useState("buy"); // Default active tab is 'Buy'
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeTab, setActiveTab] = useState("buy");
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/suggestions/locations");
+        const data = await response.json();
+        setSuggestions(data.locations); 
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    };
+
+    fetchLocations();
+  }, []);
 
   const handleSearch = () => {
     if (location.trim()) {
-      navigate(`/search?location=${location}&type=${activeTab}`);
+      navigate(`${activeTab}?location=${location}`);
     }
   };
 
@@ -70,30 +72,22 @@ const HomePage = () => {
         textAlign: "center",
         color: "white",
         padding: 2,
-
       }}
     >
-      {/* Headline */}
       <Typography
         variant="h2"
         sx={{
           fontWeight: "bold",
-          display: "block",
           textAlign: "center",
           color: "white",
           textShadow: "0 0px 5px rgba(0, 0, 0, 1)",
-          fontSize: {
-            xs: "2rem", // Extra small screens
-            sm: "3rem", // Small screens
-            md: "4rem", // Medium screens
-          },
+          fontSize: { xs: "2rem", sm: "3rem", md: "4rem" },
         }}
         gutterBottom
       >
         Discover a place <br /> you'll love to live
       </Typography>
 
-      {/* Buy and Rent Buttons */}
       <Box
         role="group"
         aria-label="search type"
@@ -112,10 +106,7 @@ const HomePage = () => {
             backgroundColor: activeTab === "buy" ? "white" : "transparent",
             color: activeTab === "buy" ? "#3b4144" : "white",
             fontWeight: activeTab === "buy" ? "bold" : "normal",
-            "&:hover": {
-              backgroundColor: "white",
-              color: "#3b4144",
-            },
+            "&:hover": { backgroundColor: "white", color: "#3b4144" },
           }}
         >
           Buy
@@ -127,17 +118,13 @@ const HomePage = () => {
             backgroundColor: activeTab === "rent" ? "white" : "transparent",
             color: activeTab === "rent" ? "#3b4144" : "white",
             fontWeight: activeTab === "rent" ? "bold" : "normal",
-            "&:hover": {
-              backgroundColor: "white",
-              color: "#3b4144",
-            },
+            "&:hover": { backgroundColor: "white", color: "#3b4144" },
           }}
         >
           Rent
         </Button>
       </Box>
 
-      {/* Search Box */}
       <Box
         sx={{
           display: "flex",
@@ -158,9 +145,7 @@ const HomePage = () => {
           value={location}
           onChange={handleChange}
           sx={{
-            "& .MuiInputBase-input": {
-              padding: "10px 0",
-            },
+            "& .MuiInputBase-input": { padding: "10px 0" },
           }}
         />
         <Button
@@ -171,9 +156,7 @@ const HomePage = () => {
             borderRadius: "20px",
             marginLeft: "10px",
             textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#cc0000",
-            },
+            "&:hover": { backgroundColor: "#cc0000" },
           }}
         >
           Search
@@ -197,18 +180,9 @@ const HomePage = () => {
               <ListItem key={index} disablePadding>
                 <ListItemButton
                   onClick={() => handleSuggestionClick(suggestion)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#f5f5f5",
-                    },
-                  }}
+                  sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}
                 >
-                  <ListItemText
-                    primary={suggestion}
-                    sx={{
-                      color: "black",
-                    }}
-                  />
+                  <ListItemText primary={suggestion} sx={{ color: "black" }} />
                 </ListItemButton>
               </ListItem>
             ))}
